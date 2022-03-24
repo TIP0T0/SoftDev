@@ -1,12 +1,14 @@
 package ru.iu3_63.fclient2;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.text.DecimalFormat;
 
 public class PinpadActivity extends AppCompatActivity {
     TextView tvPin;
@@ -23,10 +25,6 @@ public class PinpadActivity extends AppCompatActivity {
 
         ShuffleKeys();
 
-        findViewById(R.id.btnOK).setOnClickListener((View) -> {
-            finish();
-        });
-
         findViewById(R.id.btnReset).setOnClickListener((View) -> {
             pin = "";
             tvPin.setText("");
@@ -39,6 +37,23 @@ public class PinpadActivity extends AppCompatActivity {
             finish();
         });
 
+        TextView ta = findViewById(R.id.txtAmount);
+        String amt = String.valueOf(getIntent().getStringExtra("amount"));
+        Long f = Long.valueOf(amt);
+        //Long f = 100L;
+        DecimalFormat df = new DecimalFormat("#,###,###,##0.00");
+        String s = df.format(f);
+        ta.setText("Сумма: " + s);
+        TextView tp = findViewById(R.id.txtPtc);
+        int pts = getIntent().getIntExtra("ptc", 0);
+        if (pts >= 2 && pts <= 4)
+            tp.setText("Осталось "+pts+" попытки");
+        else if (pts >= 5)
+            tp.setText("Осталось "+pts+" попыток");
+        else if (pts == 1)
+            tp.setText("Осталась одна попытка!");
+        else
+            tp.setText("У вас не осталась попыток");
 
     }
 
@@ -55,7 +70,7 @@ public class PinpadActivity extends AppCompatActivity {
 
     protected void ShuffleKeys()
     {
-        Button keys[] = new Button[] {
+        Button[] keys = new Button[] {
                 findViewById(R.id.btnKey0),
                 findViewById(R.id.btnKey1),
                 findViewById(R.id.btnKey2),
