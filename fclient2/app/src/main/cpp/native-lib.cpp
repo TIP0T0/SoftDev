@@ -49,8 +49,7 @@ Java_ru_iu3_163_fclient2_MainActivity_initRng(JNIEnv *env,
 
 // ф-я возвращающая рандомные биты
 extern "C" JNIEXPORT jbyteArray JNICALL
-Java_ru_iu3_163_fclient2_MainActivity_randomBytes(JNIEnv *env,
-                                             jclass, jint no) {
+Java_ru_iu3_163_fclient2_MainActivity_randomBytes(JNIEnv *env, jclass, jint no) {
     uint8_t * buf = new uint8_t [no];
     mbedtls_ctr_drbg_random(&ctr_drbg, buf, no);
     jbyteArray rnd = env->NewByteArray(no);
@@ -168,8 +167,8 @@ Java_ru_iu3_163_fclient2_MainActivity_transaction(JNIEnv *xenv,
         jclass cls = env->GetObjectClass(thiz);
         jmethodID id = env->GetMethodID(
                 cls, "enterPin", "(ILjava/lang/String;)Ljava/lang/String;");
-        //------- pt1 jclass cls = env->GetObjectClass(thiz);
-        //------- pt1 jmethodID id = env->GetMethodID(cls, "enterPin", "(ILjava/lang/String;)Ljava/lang/String;");
+        //jclass cls = env->GetObjectClass(thiz);
+        //jmethodID id = env->GetMethodID(cls, "enterPin", "(ILjava/lang/String;)Ljava/lang/String;");
         //TRD 9F0206000000000100 = amount = 1р
         uint8_t *p = (uint8_t *) env->GetByteArrayElements(trd, 0);
         jsize sz = env->GetArrayLength(trd);
@@ -188,7 +187,7 @@ Java_ru_iu3_163_fclient2_MainActivity_transaction(JNIEnv *xenv,
             jstring pin = (jstring) env->CallObjectMethod(thiz, id, ptc, jamount);
             const char *utf = env->GetStringUTFChars(pin, nullptr);
             env->ReleaseStringUTFChars(pin, utf);
-            if ((utf != nullptr) && (strcmp(utf, "1122") == 0))
+            if ((utf != nullptr) && (strcmp(utf, "6666") == 0))
                 break;
             ptc--;
         }

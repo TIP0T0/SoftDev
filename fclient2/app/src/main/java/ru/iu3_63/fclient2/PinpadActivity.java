@@ -37,6 +37,9 @@ public class PinpadActivity extends AppCompatActivity {
             finish();
         });
 
+
+        //todo -------------------LAB_3-------------------
+
         TextView ta = findViewById(R.id.txtAmount);
         String amt = String.valueOf(getIntent().getStringExtra("amount"));
         Long f = Long.valueOf(amt);
@@ -55,6 +58,7 @@ public class PinpadActivity extends AppCompatActivity {
         else
             tp.setText("У вас не осталась попыток");
 
+        //todo -------------------LAB_3-------------------
     }
 
     public void keyClick(View v)

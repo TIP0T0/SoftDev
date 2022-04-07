@@ -9,14 +9,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements TransactionEvents {
 
@@ -28,8 +35,9 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
         System.loadLibrary("mbedcrypto");
     }
 
-
+    //todo -------------------LAB_3-------------------
     private String pin;
+
     @Override
     public String enterPin(int ptc, String amount) {
         pin = new String();
@@ -49,12 +57,12 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
 
     @Override
     public void transactionResult(boolean result) {
-        runOnUiThread(()-> {
+        runOnUiThread(() -> {
             Toast.makeText(MainActivity.this, result ? "ok" : "failed",
                     Toast.LENGTH_LONG).show();
         });
     }
-
+    //todo -------------------LAB_3-------------------
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
                             Intent data = result.getData();
                             // обработка результата
                             //String pin = data.getStringExtra("pin");
-                            //Toast.makeText(MainActiviеy.this, pin, Toast.LENGTH_SHORT);
+                            //Toast.makeText(MainActivity.this, pin, Toast.LENGTH_SHORT);
                             pin = data.getStringExtra("pin");
                             synchronized (MainActivity.this) {
                                 MainActivity.this.notifyAll();
@@ -89,8 +97,8 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
 
 
         //todo -------------------LAB_2-------------------
-        /*
-        activityResultLauncher  = registerForActivityResult(
+/*
+        activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
@@ -107,12 +115,12 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
 
         int res = initRng();
         byte[] rnd = randomBytes(10);
-        */
+*/
         //todo -------------------LAB_2-------------------
 
 
         //todo -------------------LAB_1-------------------
-        /*
+/*
         int res = initRng();
         byte[] key = randomBytes(16);
         byte[] data = randomBytes(200);
@@ -129,19 +137,34 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
                 result = false;
         }
         System.out.println(result);
-        */
-        //todo -------------------LAB_1-------------------
 
         // Example of a call to a native method
-        //TextView tv = findViewById(R.id.sample_button);
-        //tv.setText(stringFromJNI());
+        TextView tv = findViewById(R.id.sample_button);
+        tv.setText(stringFromJNI());
+*/
+        //todo -------------------LAB_1-------------------
 
     }
 
-    //todo -------------------LAB_3-------------------
+
+    //todo -------------------LAB_2-------------------
+/*
     public void onButtonClick(View v)
     {
-        /* ---- pt1
+        Intent it = new Intent(this, PinpadActivity.class);
+        Toast.makeText(this, "Enter pin", Toast.LENGTH_SHORT).show();
+        //startActivity(it);
+        activityResultLauncher.launch(it);
+    }
+*/
+    //todo -------------------LAB_2-------------------
+
+
+    //todo -------------------LAB_3-------------------
+/*
+    public void onButtonClick(View v)
+    {
+        // comment from here
         Intent it = new Intent(this, PinpadActivity.class);
         Toast.makeText(this, "Enter pin", Toast.LENGTH_SHORT).show();
         //startActivity(it);
@@ -149,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
 
         new Thread(()-> {
             try {
-                byte[] trd = stringToHex("9F0206000000000228");
+                byte[] trd = stringToHex("9F0206000000000100");
                 boolean ok = transaction(trd);
                 runOnUiThread(()-> {
                     Toast.makeText(MainActivity.this, ok ? "ok" : "failed", Toast.LENGTH_SHORT);
@@ -158,24 +181,54 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
                 // todo: log error
             }
         }).start();
-        ----- end of pt1 */
-        byte[] trd = stringToHex("9F0206000000000228");
-        transaction(trd);
+        // comment to here
+
+        //byte[] trd = stringToHex("9F0206000000000100");
+        //transaction(trd);
     }
+*/
     //todo -------------------LAB_3-------------------
 
-
-    //todo -------------------LAB_2-------------------
-    /*
-    public void onButtonClick(View v)
-    {
-        Intent it = new Intent(this, PinpadActivity.class);
-        Toast.makeText(this, "Enter pin", Toast.LENGTH_SHORT).show();
-        //startActivity(it);
-        activityResultLauncher.launch(it);
+    public void onButtonClick(View v) {
+        byte[] trd = stringToHex("9F0206000000000100");
+        testHttpClient();
     }
-     */
-    //todo -------------------LAB_2-------------------
+
+
+    //todo -------------------LAB_4-------------------
+
+    protected String getPageTitle(String html)
+    {
+        Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(html);
+        String p;
+        if (matcher.find())
+            p = matcher.group(1);
+        else
+            p = "Not found";
+        return p;
+    }
+
+    protected void testHttpClient()
+    {
+        new Thread(() -> {
+            try {
+                HttpURLConnection uc = (HttpURLConnection)
+                        (new URL("http://10.0.2.2:8081/api/v1/title").openConnection());
+                InputStream inputStream = uc.getInputStream();
+                String html = IOUtils.toString(inputStream);
+                String title = getPageTitle(html);
+                runOnUiThread(() ->
+                {
+                    Toast.makeText(this, title, Toast.LENGTH_LONG).show();
+                });
+            } catch (Exception ex) {
+                Log.e("fapptag", "Http client fails", ex);
+            }
+        }).start();
+    }
+
+    //todo -------------------LAB_4-------------------
 
 
     public static byte[] stringToHex(String s)
